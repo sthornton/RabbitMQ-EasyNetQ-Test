@@ -14,10 +14,19 @@ namespace Subscriber
         {
             using (var bus = RabbitHutch.CreateBus("host=localhost;username=user2;password=password"))
             {
-                bus.Subscribe<NewDevice>("Devices.New", x => Console.WriteLine("Id: " + x.Id + ", Name: "  + x.Name + ", Created: " + x.DateCreated));
+                bus.SubscribeAsync<NewDevice>("Devices.New", x =>
+                    Task.Factory.StartNew(() =>
+                    {
+                        PrintNewDeviceName(x);
+                    }));
                 Console.WriteLine("waiting");
                 Console.ReadLine();
             }
+        }
+
+        public static void PrintNewDeviceName(NewDevice device)
+        {
+            Console.WriteLine("Id: " + device.Id + ", Name: " + device.Name + ", Created: " + device.DateCreated);
         }
     }
 }
